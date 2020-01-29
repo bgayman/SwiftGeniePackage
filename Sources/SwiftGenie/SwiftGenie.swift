@@ -233,7 +233,7 @@ public extension UIView {
             second.b[pAxis] = easeInOutInterpolate(t: curveP, a: bStartPoints.b[pAxis], b: bEndPoints.b[pAxis])
             
             let slideP = progressOfSegmentWithinTotalProgress(a: SwiftGenieConstants.slideAnimationStart, b: SwiftGenieConstants.curvesAnimationEnd, t: t)
-            let trs  = self.transformations(for: slices, edge: edge, startPosition: easeInOutInterpolate(t: slideP, a: first.a[axis], b: first.b[axis]), totalSize: totalSize, firstBezier: first, secondBezier: second, finalRectDepth: endRectDepth)
+            let trs  = transformations(for: slices, edge: edge, startPosition: easeInOutInterpolate(t: slideP, a: first.a[axis], b: first.b[axis]), totalSize: totalSize, firstBezier: first, secondBezier: second, finalRectDepth: endRectDepth)
             trs.enumerated().forEach { (index, transform) in
                 transforms[index].append(transform)
             }
@@ -293,7 +293,7 @@ public extension UIView {
         
         guard let context = UIGraphicsGetCurrentContext() else { return nil }
         context.translateBy(x: xOffset, y: yOffset)
-        self.drawHierarchy(in: self.bounds, afterScreenUpdates: true)
+        drawHierarchy(in: bounds, afterScreenUpdates: true)
         let snapshot = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return snapshot
@@ -504,7 +504,7 @@ public extension UIView {
         c2[pAxis] = curve.b[pAxis]
         c2[axis] = (curve.a[axis] + curve.b[axis]) * 0.5
         
-        var t = (axisPos -  curve.a[axis]) / (curve.b[axis] - curve.a[axis])
+        var t = (axisPos -  curve.a[axis]) == (curve.b[axis] - curve.a[axis]) ? 1.0 : (axisPos -  curve.a[axis]) / (curve.b[axis] - curve.a[axis])
         let iterations = 3
         for _ in 0 ..< iterations {
             let nt = 1.0 - t
@@ -517,7 +517,7 @@ public extension UIView {
             t -= f / df
         }
         
-        assert(t >= 0 && t <= 1.0)
+        assert((0.0 ... 1.0) ~= t)
         
         let nt = 1.0 - t
         let ntSq = nt * nt
